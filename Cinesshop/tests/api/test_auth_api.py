@@ -1,6 +1,6 @@
 import pytest
 import requests
-from Cinesshop.constants import BASE_URL, HEADERS, REGISTER_ENDPOINT,  LOGIN_ENDPOINT
+from Cinesshop.constants import AUTH_BASE_URL, HEADERS, REGISTER_ENDPOINT,  LOGIN_ENDPOINT, MOVIES_ENDPOINT
 from Cinesshop.custom_requester.custom_requester import CustomRequest
 from Cinesshop.api.api_manager import ApiManager
 
@@ -52,7 +52,7 @@ class TestAuthAPI:
         assert response.status_code == 401, "ОшибОчка, email прошел"
 
     def test_null_body(self, test_user, test_auth_session):
-        login_url = f"{BASE_URL}/{LOGIN_ENDPOINT}"
+        login_url = f"{AUTH_BASE_URL}/{LOGIN_ENDPOINT}"
         response = test_auth_session.post(login_url)
         print(f"Response status: {response.status_code}")
         print(f"Response body: {response.text}")

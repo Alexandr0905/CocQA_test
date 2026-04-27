@@ -29,3 +29,57 @@ class DataGenerator:
         random.shuffle(password)
 
         return "".join(password)
+
+
+
+    @staticmethod
+    def generate_film_name():
+        return f"{faker.catch_phrase()}"
+
+    @staticmethod
+    def generate_film_url():
+        return f"{faker.url()}"
+
+    @staticmethod
+    def generate_film_price():
+        return faker.pyint()
+
+    @staticmethod
+    def generate_film_description():
+        return f"{faker.text()}"
+
+    @staticmethod
+    def generate_film_location():
+        return f"{faker.random_element(elements=("SPB", "MSK"))}"
+
+    @staticmethod
+    def generate_film_published():
+        return faker.boolean()
+
+    @staticmethod
+    def generate_film_genre_id():
+        return faker.pyint(1, 20)
+
+    @staticmethod
+    def generate_film_page_size():
+        return f"{faker.pyint(1, 20)}"
+
+    @staticmethod
+    def generate_film_page_num():
+        return f"{faker.pyint(1, 215)}"
+
+    @staticmethod
+    def generate_film_min_price():
+        return f"{faker.pyint(1, 100)}"
+
+    @staticmethod
+    def generate_film_max_price():
+        return f"{faker.pyint(500, 1000)}"
+
+    @staticmethod
+    def generate_film_created_at():
+        return f"{faker.random_element(elements=("asc", "desc"))}"
+
+    @staticmethod
+    def generate_film_id():
+        return faker.pyint(1, 3000)
