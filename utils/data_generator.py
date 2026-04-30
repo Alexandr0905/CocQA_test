@@ -21,7 +21,7 @@ class DataGenerator:
         special_chars = '~!?@#$%^&*_-+(){}></\\|"\'.,:'
 
         password = [letters_upper, letters_lower, digits]
-        password_lenght = random.randint(8, 30)
+        password_lenght = random.randint(8, 28)
         all_chars = letters_upper + letters_lower + digits + special_chars
 
         remaining_chars = random.choices(all_chars, k=password_lenght)

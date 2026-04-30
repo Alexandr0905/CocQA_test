@@ -1,12 +1,12 @@
-from Cinesshop.api.api_manager import ApiManager
-from constants import AUTH_BASE_URL, API_BASE_URL, HEADERS, LOGIN_ENDPOINT, REGISTER_ENDPOINT
+from api.api_manager import ApiManager
+from constants import AUTH_BASE_URL, API_BASE_URL, HEADERS, LOGIN_ENDPOINT, REGISTER_ENDPOINT, MOVIES_ENDPOINT
 import requests
 import pytest
 from utils.data_generator import DataGenerator
 from custom_requester.custom_requester import CustomRequest
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture #(scope="session")
 def test_user():
     random_email = DataGenerator.generate_random_email()
     random_name = DataGenerator.generate_random_name()
@@ -20,7 +20,7 @@ def test_user():
         "roles": ["USER"]
     }
 
-@pytest.fixture(scope="session")
+@pytest.fixture #(scope="session")
 def test_auth_session(test_user):
     register_url = f"{AUTH_BASE_URL}/{REGISTER_ENDPOINT}"
     response = requests.post(register_url, json=test_user, headers=HEADERS)
@@ -67,7 +67,7 @@ def session():
 def api_manager(session):
     return ApiManager(session)
 
-@pytest.fixture(scope="session")
+@pytest.fixture # (scope="session")
 def create_movie():
     random_name = DataGenerator.generate_film_name()
     random_url = DataGenerator.generate_film_url()
@@ -84,7 +84,7 @@ def create_movie():
         "description": random_description,
         "location": random_location,
         "published": random_published,
-        "genreId": random_genre_id
+        "genreId": 1
     }
 
 @pytest.fixture(scope="session")
@@ -144,3 +144,10 @@ def superadmin_auth_requester(auth_requester, superadmin_data):
     })
 
     return authorized_requester
+
+@pytest.fixture
+def created_movie_id(create_movie, superadmin_auth_requester, api_requester):
+    response = superadmin_auth_requester.send_request("POST", MOVIES_ENDPOINT, create_movie, 201)
+
+    movie_id = response.json()["id"]
+    yield movie_id
