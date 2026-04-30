@@ -1,8 +1,5 @@
-import pytest
-import requests
-from Cinesshop.constants import AUTH_BASE_URL, HEADERS, REGISTER_ENDPOINT,  LOGIN_ENDPOINT, MOVIES_ENDPOINT
-from Cinesshop.custom_requester.custom_requester import CustomRequest
-from Cinesshop.api.api_manager import ApiManager
+from constants import AUTH_BASE_URL, LOGIN_ENDPOINT
+
 
 class TestAuthAPI:
     def test_register_user(self, api_manager, test_user):

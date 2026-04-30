@@ -1,7 +1,7 @@
 import pytest
-import requests
-from Cinesshop.constants import AUTH_BASE_URL, HEADERS, REGISTER_ENDPOINT,  LOGIN_ENDPOINT, MOVIES_ENDPOINT
-from Cinesshop.api.api_manager import ApiManager
+from constants import MOVIES_ENDPOINT
+
+
 # from Cinesshop.custom_requester.custom_requester import CustomRequest
 
 

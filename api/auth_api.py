@@ -1,5 +1,5 @@
-from Cinesshop.constants import LOGIN_ENDPOINT, REGISTER_ENDPOINT
-from Cinesshop.custom_requester.custom_requester import CustomRequest
+from constants import LOGIN_ENDPOINT, REGISTER_ENDPOINT
+from custom_requester.custom_requester import CustomRequest
 
 class AuthAPI(CustomRequest):
     def __init__(self, session):

@@ -1,4 +1,4 @@
-from Cinesshop.custom_requester.custom_requester import CustomRequest
+from custom_requester.custom_requester import CustomRequest
 
 class UserAPI(CustomRequest):
     def __init__(self, session):

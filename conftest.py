@@ -1,4 +1,4 @@
-from Cinesshop.api.api_manager import ApiManager
+from api.api_manager import ApiManager
 from constants import AUTH_BASE_URL, API_BASE_URL, HEADERS, LOGIN_ENDPOINT, REGISTER_ENDPOINT, MOVIES_ENDPOINT
 import requests
 import pytest
@@ -6,7 +6,7 @@ from utils.data_generator import DataGenerator
 from custom_requester.custom_requester import CustomRequest
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture #(scope="session")
 def test_user():
     random_email = DataGenerator.generate_random_email()
     random_name = DataGenerator.generate_random_name()
@@ -20,7 +20,7 @@ def test_user():
         "roles": ["USER"]
     }
 
-@pytest.fixture(scope="session")
+@pytest.fixture #(scope="session")
 def test_auth_session(test_user):
     register_url = f"{AUTH_BASE_URL}/{REGISTER_ENDPOINT}"
     response = requests.post(register_url, json=test_user, headers=HEADERS)
