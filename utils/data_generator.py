@@ -66,7 +66,7 @@ class DataGenerator:
 
     @staticmethod
     def generate_film_page_num():
-        return f"{faker.pyint(1, 215)}"
+        return f"{faker.pyint(1, 5)}"
 
     @staticmethod
     def generate_film_min_price():
