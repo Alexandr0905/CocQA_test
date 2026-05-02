@@ -63,7 +63,8 @@ class TestMoviesApiNegative:
             response = movies_api.create_movie(None, expected_status=400)
             response_data = response.json()
 
-            assert response_data["error"] == "Bad Request", f"Ожидали 'Bad Request', получили '{response_data['message']}'"
+            assert response_data["error"] == "Bad Request"
+            assert "message" in response_data, "В ответе отсутствует описание ошибки (message)"
 
         @pytest.mark.parametrize("field, invalid_value", [
             ("name", True),
@@ -161,4 +162,4 @@ class TestMoviesApiNegative:
         def test_patch_movie_invalid_body(self, movies_api, payload, expected_status, get_created_movie_id):
             response = movies_api.patch_update_movie(get_created_movie_id, update_payload=payload, expected_status=expected_status)
 
-            assert "message" or "error" in response.json()
+            assert "message" in response.json() or "error" in response.json()
