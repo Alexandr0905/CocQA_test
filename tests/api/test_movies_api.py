@@ -35,7 +35,7 @@ class TestMoviesApiPositive:
 
         movie_id = response.json()["id"]
         assert get_created_movie_id == movie_id, "ID фильма на удаление и непосредственно удаленного фильма не совпадают"
-        get_response = api_manager.movies_api.get_movie(movie_id, expected_status=404)
+        api_manager.movies_api.get_movie(movie_id, expected_status=404)
 
     def test_editing_movie(self, get_created_movie_id, random_movie_price, api_manager):
         data = {

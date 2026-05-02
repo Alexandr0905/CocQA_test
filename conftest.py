@@ -4,6 +4,7 @@ import requests
 import pytest
 from utils.data_generator import DataGenerator
 from custom_requester.custom_requester import CustomRequest
+from api.movies_api import MoviesAPI
 
 @pytest.fixture
 def test_user():
@@ -16,6 +17,12 @@ def test_user():
         "roles": ["USER"]
     }
 
+@pytest.fixture(scope="session")
+def session():
+    http_session = requests.Session()
+    yield http_session
+    http_session.close()
+
 @pytest.fixture
 def registered_user(requester, test_user):
     response = requester.send_request(method="POST", endpoint=REGISTER_ENDPOINT, data=test_user, expected_status=201)
@@ -24,39 +31,20 @@ def registered_user(requester, test_user):
     registered_user["id"] = response_data["id"]
     return registered_user
 
-@pytest.fixture(scope="session")
-def session_user():
-    random_password = DataGenerator.generate_random_password()
-    return {
-        "email": DataGenerator.generate_random_email(),
-        "fullName": "Session Admin",
-        "password": random_password,
-        "passwordRepeat": random_password,
-        "roles": ["USER"]
-    }
-
 @pytest.fixture
-def requester(auth_requester):
-    return auth_requester
-
-@pytest.fixture(scope="session")
-def api_manager(auth_requester, api_requester, superadmin_data):
-    login_response = auth_requester.send_request("POST", LOGIN_ENDPOINT, superadmin_data, 200)
-    token = login_response.json().get("accessToken")
-
-    api_requester.session.headers.update({"Authorization": f"Bearer {token}"})
-
-    return ApiManager(api_requester.session)
-
-@pytest.fixture(scope="session")
-def auth_requester():
-    session = requests.Session()
+def requester(session):
     return CustomRequest(session=session, base_url=AUTH_BASE_URL)
 
 @pytest.fixture(scope="session")
-def api_requester():
-    session = requests.Session()
-    return CustomRequest(session=session, base_url=API_BASE_URL)
+def api_manager(session, superadmin_data):
+    login_url = f"{AUTH_BASE_URL}{LOGIN_ENDPOINT}"
+    response = session.post(login_url, json=superadmin_data)
+    assert response.status_code == 200, "Не удалось авторизовать суперадмина для сессии"
+
+    token = response.json().get("accessToken")
+    session.headers.update({"Authorization": f"Bearer {token}"})
+
+    return ApiManager(session)
 
 @pytest.fixture(scope="session")
 def superadmin_data():
@@ -67,7 +55,6 @@ def superadmin_data():
 
 @pytest.fixture
 def unauthorized_movies_api():
-    from api.movies_api import MoviesAPI
     session = requests.Session()
     movies_api = MoviesAPI(session=session)
     return movies_api
