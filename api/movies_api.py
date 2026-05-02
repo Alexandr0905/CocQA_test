@@ -1,8 +1,10 @@
 from custom_requester.custom_requester import CustomRequest
-from constants import MOVIES_ENDPOINT
+from constants import MOVIES_ENDPOINT, API_BASE_URL
 
 
 class MoviesAPI(CustomRequest):
+    def __init__(self, session):
+        super().__init__(session=session, base_url=API_BASE_URL)
 
     def create_movie(self, movie_payload, expected_status=201):
         return self.send_request("POST", MOVIES_ENDPOINT, data=movie_payload, expected_status=expected_status)

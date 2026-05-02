@@ -1,9 +1,9 @@
-from constants import LOGIN_ENDPOINT, REGISTER_ENDPOINT
+from constants import LOGIN_ENDPOINT, REGISTER_ENDPOINT, AUTH_BASE_URL
 from custom_requester.custom_requester import CustomRequest
 
 class AuthAPI(CustomRequest):
     def __init__(self, session):
-        super().__init__(session=session, base_url="https://auth.dev-cinescope.coconutqa.ru/")
+        super().__init__(session=session, base_url=AUTH_BASE_URL)
 
     def register_user(self, user_data, expected_status=201):
         return self.send_request("POST", REGISTER_ENDPOINT, user_data, expected_status)

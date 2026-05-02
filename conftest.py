@@ -4,7 +4,6 @@ import requests
 import pytest
 from utils.data_generator import DataGenerator
 from custom_requester.custom_requester import CustomRequest
-from api.movies_api import MoviesAPI
 
 @pytest.fixture
 def test_user():
@@ -36,47 +35,44 @@ def session_user():
         "roles": ["USER"]
     }
 
-@pytest.fixture(scope="session")
-def test_auth_session(session_user):
-    register_url = f"{AUTH_BASE_URL}/{REGISTER_ENDPOINT}"
-    response = requests.post(register_url, json=session_user, headers=HEADERS)
-    assert response.status_code == 201, "Пользователь для сессии не был создан"
-
-    login_url = f"{AUTH_BASE_URL}/{LOGIN_ENDPOINT}"
-    login_data = {
-        "email": session_user["email"],
-        "password": session_user["password"]
-    }
-
-    response = requests.post(login_url, json=login_data, headers=HEADERS)
-    assert response.status_code == 200, "Ошибка авторизации сессии"
-
-    access_token = response.json().get("accessToken")
-    assert access_token is not None, "Токен доступа отсутствует"
-
-    session = requests.Session()
-    session.headers.update(HEADERS)
-    session.headers.update({"Authorization": f"Bearer {access_token}"})
-    return session
-
-
-
 @pytest.fixture
-def requester():
+def requester(auth_requester):
+    return auth_requester
+
+@pytest.fixture(scope="session")
+def api_manager(auth_requester, api_requester, superadmin_data):
+    login_response = auth_requester.send_request("POST", LOGIN_ENDPOINT, superadmin_data, 200)
+    token = login_response.json().get("accessToken")
+
+    api_requester.session.headers.update({"Authorization": f"Bearer {token}"})
+
+    return ApiManager(api_requester.session)
+
+@pytest.fixture(scope="session")
+def auth_requester():
     session = requests.Session()
     return CustomRequest(session=session, base_url=AUTH_BASE_URL)
 
 @pytest.fixture(scope="session")
-def session():
-    http_session = requests.Session()
-    yield http_session
-    http_session.close()
+def api_requester():
+    session = requests.Session()
+    return CustomRequest(session=session, base_url=API_BASE_URL)
 
 @pytest.fixture(scope="session")
-def api_manager(session):
-    return ApiManager(session)
+def superadmin_data():
+    return {
+        "email": "api1@gmail.com",
+        "password": "asdqwe123Q"
+    }
 
-@pytest.fixture # (scope="session")
+@pytest.fixture
+def unauthorized_movies_api():
+    from api.movies_api import MoviesAPI
+    session = requests.Session()
+    movies_api = MoviesAPI(session=session)
+    return movies_api
+
+@pytest.fixture
 def movie_payload():
     random_name = DataGenerator.generate_film_name()
     random_url = DataGenerator.generate_film_url()
@@ -128,50 +124,6 @@ def get_movie_id():
     return random_film_id
 
 @pytest.fixture
-def superadmin_data():
-    return {
-        "email": "api1@gmail.com",
-        "password": "asdqwe123Q"
-    }
-
-@pytest.fixture
-def auth_requester():
-    session = requests.Session()
-    return CustomRequest(session=session, base_url=AUTH_BASE_URL)
-
-@pytest.fixture
-def api_requester():
-    session = requests.Session()
-    return CustomRequest(session=session, base_url=API_BASE_URL)
-
-@pytest.fixture
-def superadmin_auth_requester(auth_requester, superadmin_data, api_requester):
-    login_response = auth_requester.send_request("POST", LOGIN_ENDPOINT, superadmin_data, 200)
-
-    token = login_response.json().get("accessToken")
-    assert token is not None, "Токен не получен при авторизации"
-
-    api_requester.session.headers.update({"Authorization": f"Bearer {token}"})
-
-    return api_requester
-
-@pytest.fixture
-def get_created_movie_id(movie_payload, superadmin_auth_requester, api_requester):
-    response = superadmin_auth_requester.send_request("POST", MOVIES_ENDPOINT, movie_payload, 201)
-
-    movie_id = response.json()["id"]
-    yield movie_id
-
-@pytest.fixture
-def movies_api(superadmin_auth_requester):
-    from api.movies_api import MoviesAPI
-    movies_api = MoviesAPI(session=superadmin_auth_requester.session, base_url=API_BASE_URL)
-    return movies_api
-
-
-@pytest.fixture
-def unauthorized_movies_api():
-    from api.movies_api import MoviesAPI
-    session = requests.Session()
-    movies_api = MoviesAPI(session=session, base_url=API_BASE_URL)
-    return movies_api
+def get_created_movie_id(api_manager, movie_payload):
+    response = api_manager.movies_api.create_movie(movie_payload, expected_status=201)
+    return response.json()["id"]

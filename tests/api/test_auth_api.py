@@ -48,9 +48,9 @@ class TestAuthAPI:
         print(f"Response body: {response.text}")
         assert response.status_code == 401, "ОшибОчка, email прошел"
 
-    def test_null_body(self, test_user, test_auth_session):
+    def test_null_body(self, test_user, api_manager):
         login_url = f"{AUTH_BASE_URL}/{LOGIN_ENDPOINT}"
-        response = test_auth_session.post(login_url)
+        response = api_manager.session.post(login_url)
         print(f"Response status: {response.status_code}")
         print(f"Response body: {response.text}")
         assert response.status_code == 401, "ОшибОчка тела запроса"
