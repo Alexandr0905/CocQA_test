@@ -3,8 +3,6 @@ from constants import AUTH_BASE_URL, API_BASE_URL, HEADERS, LOGIN_ENDPOINT, REGI
 import requests
 import pytest
 from utils.data_generator import DataGenerator
-from custom_requester.custom_requester import CustomRequest
-from api.movies_api import MoviesAPI
 
 @pytest.fixture
 def test_user():
@@ -24,40 +22,35 @@ def session():
     http_session.close()
 
 @pytest.fixture
-def registered_user(requester, test_user):
-    response = requester.send_request(method="POST", endpoint=REGISTER_ENDPOINT, data=test_user, expected_status=201)
+def registered_user(api_manager, test_user):
+    response = api_manager.auth_api.register_user(test_user, expected_status=201)
     response_data = response.json()
     registered_user = test_user.copy()
     registered_user["id"] = response_data["id"]
     return registered_user
 
+@pytest.fixture(scope="session")
+def api_manager(session):
+    return ApiManager(session)
+
 @pytest.fixture
-def requester(session):
-    return CustomRequest(session=session, base_url=AUTH_BASE_URL)
+def unauthorized_session():
+    http_session = requests.Session()
+    yield http_session
+    http_session.close()
+
+@pytest.fixture
+def unauthorized_api_manager(unauthorized_session):
+    return ApiManager(unauthorized_session)
 
 @pytest.fixture(scope="session")
-def api_manager(session, superadmin_data):
-    login_url = f"{AUTH_BASE_URL}{LOGIN_ENDPOINT}"
-    response = session.post(login_url, json=superadmin_data)
-    assert response.status_code == 200, "Не удалось авторизовать суперадмина для сессии"
-
-    token = response.json().get("accessToken")
-    session.headers.update({"Authorization": f"Bearer {token}"})
-
-    return ApiManager(session)
+def superadmin_user(api_manager, superadmin_data):
+    api_manager.auth_api.authenticate(superadmin_data)
+    return api_manager
 
 @pytest.fixture(scope="session")
 def superadmin_data():
-    return {
-        "email": "api1@gmail.com",
-        "password": "asdqwe123Q"
-    }
-
-@pytest.fixture
-def unauthorized_movies_api():
-    session = requests.Session()
-    movies_api = MoviesAPI(session=session)
-    return movies_api
+    return ("api1@gmail.com", "asdqwe123Q")
 
 @pytest.fixture
 def movie_payload():
@@ -111,6 +104,6 @@ def get_movie_id():
     return random_film_id
 
 @pytest.fixture
-def get_created_movie_id(api_manager, movie_payload):
-    response = api_manager.movies_api.create_movie(movie_payload, expected_status=201)
+def get_created_movie_id(superadmin_user, movie_payload):
+    response = superadmin_user.movies_api.create_movie(movie_payload, expected_status=201)
     return response.json()["id"]
