@@ -21,14 +21,6 @@ def session():
     yield http_session
     http_session.close()
 
-@pytest.fixture
-def registered_user(api_manager, test_user):
-    response = api_manager.auth_api.register_user(test_user, expected_status=201)
-    response_data = response.json()
-    registered_user = test_user.copy()
-    registered_user["id"] = response_data["id"]
-    return registered_user
-
 @pytest.fixture(scope="session")
 def api_manager(session):
     return ApiManager(session)
