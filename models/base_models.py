@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field, field_validator
-from typing import Optional, List
+from pydantic import BaseModel, Field, field_validator, AwareDatetime, confloat
+from typing import Optional, List, Any
 from datetime import datetime
 from constants import Roles, City
 
@@ -54,22 +54,22 @@ class RegisterUserResponse(BaseModel):
             raise ValueError("Некорректный формат даты и времени. Ожидается формат ISO 8601.")
         return value
 
-
 class MovieResponseModel(BaseModel):
-    id: int
-    name: str
-    price: int
-    description: str
-    imageUrl: str
-    location: City
-    published: bool
-    rating: float
-    genreId: int
-    createdAt: datetime
+    id: float = Field(..., examples=[2])
+    name: str = Field(..., examples=['Название фильма'])
+    price: float = Field(..., examples=[200])
+    description: str = Field(..., examples=['Описание фильма'])
+    imageUrl: str = Field(..., examples=['https://image.url'])
+    location: City = Field(..., examples=['MSK'])
+    published: bool = Field(..., examples=[True])
+    genreId: float = Field(..., examples=[1])
+    genre: dict[str, Any] = Field(..., examples=[{'name': 'Драма'}])
+    createdAt: AwareDatetime = Field(..., examples=['2024-02-28T04:28:15.965Z'])
+    rating: confloat(ge=0.0, le=5.0) = Field(..., examples=[5])
 
 class MoviesListResponseModel(BaseModel):
-    movies: List[MovieResponseModel]
-    count: int = Field(..., ge=0)
-    page: int
-    pageSize: int
-    pageCount: int
+    movies: list[MovieResponseModel]
+    count: float = Field(..., examples=[13])
+    page: float = Field(..., examples=[1])
+    pageSize: float = Field(..., examples=[10])
+    pageCount: float = Field(..., examples=[2])
