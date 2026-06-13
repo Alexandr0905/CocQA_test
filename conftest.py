@@ -190,3 +190,13 @@ def created_test_user(db_helper):
 @pytest.fixture(scope="function")
 def movie_data():
     return DataGenerator.generate_movie_data()
+
+
+@pytest.fixture
+def db_movie_lifecycle(super_admin, movie_payload):
+    response = super_admin.api.movies_api.create_movie(movie_payload)
+    movie_id = response.json()["id"]
+
+    yield movie_id, movie_payload
+
+    super_admin.api.movies_api.delete_movie(movie_id)

@@ -1,6 +1,5 @@
 from sqlalchemy import Column, String, Boolean, DateTime, Float, Integer, ColumnElement
 from sqlalchemy.orm import declarative_base
-from typing import Dict, Any
 
 Base = declarative_base()
 

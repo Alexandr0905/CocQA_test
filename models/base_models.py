@@ -60,13 +60,16 @@ class MovieResponseModel(BaseModel):
     name: str
     price: int
     description: str
-    imageUrl: Optional[str] = None
+    imageUrl: str
     location: City
     published: bool
-    rating: Optional[float] = None
+    rating: float
     genreId: int
     createdAt: datetime
 
 class MoviesListResponseModel(BaseModel):
-    count: int = Field(..., ge=0)
     movies: List[MovieResponseModel]
+    count: int = Field(..., ge=0)
+    page: int
+    pageSize: int
+    pageCount: int

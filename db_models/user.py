@@ -19,7 +19,6 @@ class UserDBModel(Base):
     roles = Column(String)  # text в БД (Role enum)
 
     def to_dict(self) -> Dict[str, Any]:
-        """Преобразование в словарь"""
         return {
             'id': self.id,
             'email': self.email,

@@ -1,5 +1,4 @@
 import json
-import requests
 import logging
 import os
 from pydantic import BaseModel

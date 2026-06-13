@@ -1,11 +1,7 @@
-from http.client import responses
-
 import pytest
 import allure
 
 from conftest import common_user, admin, super_admin, get_created_movie_id
-from models.base_models import MoviesListResponseModel
-
 
 @allure.epic("Cinesshop movies api")
 @pytest.mark.api
@@ -345,20 +341,16 @@ class TestMoviesApiNegative:
 @pytest.mark.regression
 class TestDbRequests:
 
-    @allure.title("Проверка фильма в Базе Данных")
-    def test_movie_lifecycle(self, db_helper, super_admin, movie_payload):
-        with allure.step("Проверяем по БД, что фильма с таким именем еще нет в системе"):
-            assert db_helper.get_movie_by_name(movie_payload["name"]) is None, "Фильм уже существует в БД до создания"
+    @allure.title("Проверка соответствия данных API и Базы Данных")
+    def test_movie_lifecycle(self, db_helper, db_movie_lifecycle):
+        movie_id, movie_payload = db_movie_lifecycle
 
-        with allure.step("Создаем фильм через отправку запроса к API"):
-            response = super_admin.api.movies_api.create_movie(movie_payload)
-            movie_id = response.json()["id"]
+        with allure.step(f"Делаем прямой запрос в БД по ID {movie_id} и сверяем корректность полей"):
+            db_movie = db_helper.get_movie_by_id(movie_id)
 
-        with allure.step(f"Делаем прямой запрос в БД по ID {movie_id} и подтверждаем запись"):
-            assert db_helper.get_movie_by_id(movie_id) is not None, "Фильм не появился в БД после создания через API"
+            assert db_movie is not None, f"Фильм с ID {movie_id} отсутствует в БД"
 
-        with allure.step("Удаляем фильм через вызов API"):
-            super_admin.api.movies_api.delete_movie(movie_id)
-
-        with allure.step("Проверяем прямым запросом в БД, что запись о фильме успешно удалена"):
-            assert db_helper.get_movie_by_id(movie_id) is None, "Фильм не удалился из БД после удаления через API"
+            assert db_movie.name == movie_payload["name"], f"Не совпало имя: {db_movie.name} != {movie_payload['name']}"
+            assert db_movie.price == movie_payload["price"], f"Не совпала цена: {db_movie.price} != {movie_payload['price']}"
+            assert db_movie.genre_id == movie_payload["genreId"], f"Ожидали genreId {movie_payload['genreId']}, в БД записалось {db_movie.genre_id}"
+            assert db_movie.location == movie_payload["location"], f"Не совпала локация: {db_movie.location} != {movie_payload['location']}"
