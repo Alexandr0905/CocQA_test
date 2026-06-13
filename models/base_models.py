@@ -49,7 +49,7 @@ class RegisterUserResponse(BaseModel):
     @field_validator("createdAt")
     def validate_created_at(cls, value: str) -> str:
         try:
-            datetime.datetime.fromisoformat(value)
+            datetime.fromisoformat(value)
         except ValueError:
             raise ValueError("Некорректный формат даты и времени. Ожидается формат ISO 8601.")
         return value
