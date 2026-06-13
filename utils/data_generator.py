@@ -1,3 +1,6 @@
+import datetime
+from datetime import datetime
+
 from faker import Faker
 faker = Faker()
 import random
@@ -18,19 +21,25 @@ class DataGenerator:
         letters_upper = random.choice(string.ascii_uppercase)
         letters_lower = random.choice(string.ascii_lowercase)
         digits = random.choice(string.digits)
-        special_chars = '~!?@#$%^&*_-+(){}></\\|"\'.,:'
 
+        special_chars = '?@#$%^&*_-+()[]{}>></\\|"\',.:'
         password = [letters_upper, letters_lower, digits]
-        password_lenght = random.randint(8, 28)
-        all_chars = letters_upper + letters_lower + digits + special_chars
 
-        remaining_chars = random.choices(all_chars, k=password_lenght)
+        total_length = random.randint(8, 20)
+        remaining_length = total_length - len(password)
+
+        all_chars = string.ascii_letters + string.digits + special_chars
+
+        remaining_chars = random.choices(all_chars, k=remaining_length)
         password.extend(remaining_chars)
+
         random.shuffle(password)
 
         return "".join(password)
 
-
+    @staticmethod
+    def generate_film_id():
+        return faker.pyint(2000, 3000)
 
     @staticmethod
     def generate_film_name():
@@ -81,5 +90,38 @@ class DataGenerator:
         return f"{faker.random_element(elements=("asc", "desc"))}"
 
     @staticmethod
-    def generate_film_id():
-        return faker.pyint(1, 3000)
+    def generate_film_created_at_data() -> str:
+        from datetime import datetime
+        return datetime.now().isoformat()
+
+    @staticmethod
+    def generate_user_data() -> dict:
+        from uuid import uuid4
+
+        return {
+            'id': f'{uuid4()}',  # генерируем UUID как строку
+            'email': DataGenerator.generate_random_email(),
+            'full_name': DataGenerator.generate_random_name(),
+            'password': DataGenerator.generate_random_password(),
+            'created_at': datetime.datetime.now(),
+            'updated_at': datetime.datetime.now(),
+            'verified': False,
+            'banned': False,
+            'roles': '{USER}'
+        }
+
+    @staticmethod
+    def generate_movie_data() -> dict:
+
+        return {
+            # 'id': DataGenerator.generate_film_id(),
+            'name': DataGenerator.generate_film_name(),
+            'price': DataGenerator.generate_film_price(),
+            'description': DataGenerator.generate_film_description(),
+            'image_url': DataGenerator.generate_film_url(),
+            'location': DataGenerator.generate_film_location(),
+            'published': DataGenerator.generate_film_published(),
+            'rating': 4.55,
+            'genre_id': DataGenerator.generate_film_genre_id(),
+            'created_at': DataGenerator.generate_film_created_at_data()
+        }
