@@ -44,4 +44,6 @@ class MoviesAPI(CustomRequest):
 
     def delete_movie(self, movie_id, expected_status=200):
         response = self.send_request("DELETE", f"{MOVIES_ENDPOINT}/{movie_id}", expected_status=expected_status)
+        if response.status_code == 200:
+            MovieResponseModel.model_validate(response.json())
         return response
