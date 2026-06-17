@@ -1,5 +1,6 @@
 from custom_requester.custom_requester import CustomRequest
 from constants import MOVIES_ENDPOINT, API_BASE_URL
+from models.base_models import MoviesListResponseModel, MovieResponseModel
 
 
 class MoviesAPI(CustomRequest):
@@ -7,19 +8,42 @@ class MoviesAPI(CustomRequest):
         super().__init__(session=session, base_url=API_BASE_URL)
 
     def create_movie(self, movie_payload, expected_status=201):
-        return self.send_request("POST", MOVIES_ENDPOINT, data=movie_payload, expected_status=expected_status)
+        response = self.send_request("POST", MOVIES_ENDPOINT, data=movie_payload, expected_status=expected_status)
+
+        if response.status_code == 201:
+            MovieResponseModel.model_validate(response.json())
+        return response
 
     def get_movie(self, movie_id, expected_status=200):
-        return self.send_request("GET", f"{MOVIES_ENDPOINT}/{movie_id}", expected_status=expected_status)
+        response = self.send_request("GET", f"{MOVIES_ENDPOINT}/{movie_id}", expected_status=expected_status)
+
+        if response.status_code == 200:
+            MovieResponseModel.model_validate(response.json())
+        return response
 
     def get_movies(self, params=None, expected_status=200):
-        return self.send_request("GET", MOVIES_ENDPOINT, params=params, expected_status=expected_status)
+        response = self.send_request("GET", MOVIES_ENDPOINT, params=params, expected_status=expected_status)
+
+        if response.status_code == 200:
+            MoviesListResponseModel.model_validate(response.json())
+        return response
 
     def put_update_movie(self, movie_id, update_payload, expected_status=200):
-        return self.send_request("PUT", f"{MOVIES_ENDPOINT}/{movie_id}", data=update_payload, expected_status=expected_status)
+        response = self.send_request("PUT", f"{MOVIES_ENDPOINT}/{movie_id}", data=update_payload, expected_status=expected_status)
+
+        if response.status_code == 200:
+            MovieResponseModel.model_validate(response.json())
+        return response
 
     def patch_update_movie(self, movie_id, update_payload, expected_status=200):
-        return self.send_request("PATCH", f"{MOVIES_ENDPOINT}/{movie_id}", data=update_payload, expected_status=expected_status)
+        response = self.send_request("PATCH", f"{MOVIES_ENDPOINT}/{movie_id}", data=update_payload, expected_status=expected_status)
+
+        if response.status_code == 200:
+            MovieResponseModel.model_validate(response.json())
+        return response
 
     def delete_movie(self, movie_id, expected_status=200):
-        return self.send_request("DELETE", f"{MOVIES_ENDPOINT}/{movie_id}", expected_status=expected_status)
+        response = self.send_request("DELETE", f"{MOVIES_ENDPOINT}/{movie_id}", expected_status=expected_status)
+        if response.status_code == 200:
+            MovieResponseModel.model_validate(response.json())
+        return response
