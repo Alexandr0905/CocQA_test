@@ -3,7 +3,7 @@ import requests
 import pytest
 
 from entities.user import User
-from models.base_models import TestUser, CreateUserData
+from models.base_models import TestUser, CreateUserData, Review_Data
 from utils.data_generator import DataGenerator
 from resources.user_creds import SuperAdminCreds
 from constants import Roles
@@ -200,3 +200,15 @@ def db_movie_lifecycle(super_admin, movie_payload):
     yield movie_id, movie_payload
 
     super_admin.api.movies_api.delete_movie(movie_id)
+
+@pytest.fixture
+def registered_user(unauthorized_api_manager, test_user):
+    unauthorized_api_manager.auth_api.register_user(test_user)
+    return test_user
+
+@pytest.fixture
+def review_data() -> Review_Data:
+    return Review_Data(
+        text=DataGenerator.generate_review_description(),
+        rating=DataGenerator.generate_review_rating()
+    )
