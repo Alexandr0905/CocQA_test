@@ -4,7 +4,8 @@ import allure
 import pytest
 from playwright.sync_api import sync_playwright
 
-from models.page_object_models import CinescopeLoginPage, CinescopeReviewsPage
+from models.pages.login_page import CinescopeLoginPage
+from models.pages.review_page import CinescopeReviewsPage
 
 @allure.epic("Тестирование UI")
 @allure.feature("Тестирование прикрепления отзыва к фильму")

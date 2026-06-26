@@ -8,9 +8,9 @@ HEADERS = {
     "Accept": "application/json"
 }
 
-LOGIN_ENDPOINT = "/login"
-REGISTER_ENDPOINT = "/register"
-MOVIES_ENDPOINT = "/movies"
+LOGIN_ENDPOINT = "login"
+REGISTER_ENDPOINT = "register"
+MOVIES_ENDPOINT = "movies"
 
 RED = '\033[31m'
 GREEN = '\033[32m'
