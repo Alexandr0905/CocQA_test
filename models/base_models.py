@@ -74,3 +74,7 @@ class MoviesListResponseModel(BaseModel):
     page: int = Field(..., examples=[1])
     pageSize: int = Field(..., examples=[10])
     pageCount: int = Field(..., examples=[2])
+
+class Review_Data(BaseModel):
+    rating: str = Field(..., examples=["4"])
+    text: str = Field(..., examples=['Хорошее кино'])

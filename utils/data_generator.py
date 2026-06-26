@@ -22,7 +22,7 @@ class DataGenerator:
         letters_lower = random.choice(string.ascii_lowercase)
         digits = random.choice(string.digits)
 
-        special_chars = '?@#$%^&*_-+()[]{}>></\\|"\',.:'
+        special_chars = '?@#$%^&*_-+()[]{}'
         password = [letters_upper, letters_lower, digits]
 
         total_length = random.randint(8, 20)
@@ -125,3 +125,11 @@ class DataGenerator:
             'genre_id': DataGenerator.generate_film_genre_id(),
             'created_at': DataGenerator.generate_film_created_at_data()
         }
+
+    @staticmethod
+    def generate_review_description():
+        return f"{faker.text()}"
+
+    @staticmethod
+    def generate_review_rating():
+        return str(faker.pyint(1, 5))
